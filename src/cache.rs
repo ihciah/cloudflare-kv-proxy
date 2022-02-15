@@ -27,6 +27,7 @@ pub(crate) fn new_cache(cache_size: usize, expire_ttl: Duration) -> Cache {
 }
 
 impl Client {
+    /// Get value of a key.
     pub async fn get<T: DeserializeOwned + Serialize>(&self, key: &str) -> Result<T> {
         // try read cache
         if let Some(cv) = self.get_cache(key) {
@@ -43,10 +44,12 @@ impl Client {
         r
     }
 
+    /// Clear all cached values.
     pub fn clear_cached(&self) {
         self.cache.inner.lock().clear()
     }
 
+    /// Delete a single key value from cache only.
     pub fn prune_cached(&self, key: &str) {
         self.cache.inner.lock().pop(key);
     }

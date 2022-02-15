@@ -45,9 +45,9 @@ async function handleRequest(request) {
         });
     } else if (request.method == "PUT") {
         var value = await request.text();
-        var ttl = parseInt(request.headers.get("key"), 10);
+        var ttl = parseInt(request.headers.get("ttl"), 10);
         var opt = {};
-        if (ttl != NaN && ttl >= 60) {
+        if (ttl >= 60) {
             opt = { expirationTtl: ttl }
         }
         await KV.put(key, value, opt);

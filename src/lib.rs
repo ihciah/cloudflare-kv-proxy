@@ -1,7 +1,7 @@
 mod types;
-
 use reqwest::{header, Response};
 use serde::Serialize;
+use std::time::Duration;
 use types::ApiResult;
 pub use types::{Error, Result};
 
@@ -20,6 +20,7 @@ macro_rules! execute {
 #[cfg(feature = "cache")]
 mod cache;
 
+/// KV Client.
 #[derive(Debug)]
 pub struct Client {
     endpoint: String,
@@ -29,6 +30,7 @@ pub struct Client {
     cache: cache::Cache,
 }
 
+/// Error when creating KV Client.
 #[derive(thiserror::Error, Debug)]
 pub enum ClientError {
     #[error("token format error {0}")]
@@ -38,6 +40,8 @@ pub enum ClientError {
 }
 
 impl Client {
+    /// Create client with endpoint and token.
+    /// If cache is enabled, you may set cache size and ttl.
     pub fn new<T: Into<String>, E: Into<String>>(
         endpoint: E,
         token: T,
@@ -62,11 +66,13 @@ impl Client {
         })
     }
 
+    /// Get value of a key.
     #[cfg(not(feature = "cache"))]
     pub async fn get<T: serde::de::DeserializeOwned>(&self, key: &str) -> Result<T> {
         execute!(self.client.get(format!("{}{}", self.endpoint, key)))
     }
 
+    /// Set a key value pair.
     pub async fn put<T: Serialize + ?Sized>(&self, key: &str, value: &T) -> Result<()> {
         let r: Result<()> = execute!(self
             .client
@@ -79,6 +85,26 @@ impl Client {
         r
     }
 
+    /// Set a key value pair with ttl.
+    pub async fn put_with_ttl<T: Serialize + ?Sized>(
+        &self,
+        key: &str,
+        value: &T,
+        ttl: Duration,
+    ) -> Result<()> {
+        let r: Result<()> = execute!(self
+            .client
+            .put(format!("{}{}", self.endpoint, key))
+            .header("ttl", ttl.as_secs())
+            .json(value));
+        #[cfg(feature = "cache")]
+        if r.is_ok() {
+            self.set_cache(key, value);
+        }
+        r
+    }
+
+    /// Delete a key value pair.
     pub async fn delete(&self, key: &str) -> Result<()> {
         let r: Result<()> = execute!(self.client.delete(format!("{}{}", self.endpoint, key)));
         #[cfg(feature = "cache")]
