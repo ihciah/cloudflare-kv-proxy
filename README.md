@@ -2,6 +2,7 @@
 [![Crates.io][crates-badge]][crates-url]
 [![MIT/Apache-2 licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
+
 This project is implemented to use Cloudflare KV in non-worker environment.
 
 ## Setup KV and Proxy
@@ -40,5 +41,5 @@ By default the caching is enabled. You can set `default-features = false` in `Ca
 [crates-url]: https://crates.io/crates/cloudflare-kv-proxy
 [license-badge]: https://img.shields.io/crates/l/cloudflare-kv-proxy.svg
 [license-url]: LICENSE-MIT
-[actions-badge]: https://github.com/ihciah/cloudflare-kv-proxy/actions/workflows/ci.yml/badge.svg
+[actions-badge]: https://github.com/ihciah/cloudflare-kv-proxy/actions/workflows/ci.yaml/badge.svg
 [actions-url]: https://github.com/ihciah/cloudflare-kv-proxy/actions
