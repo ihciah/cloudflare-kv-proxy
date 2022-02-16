@@ -3,7 +3,7 @@ use reqwest::{header, Response};
 use serde::Serialize;
 use std::time::Duration;
 use types::ApiResult;
-pub use types::{Error, Result};
+pub use types::{Error, NotFoundMapping, Result};
 
 macro_rules! execute {
     ($send: expr) => {

@@ -55,3 +55,16 @@ where
         }
     }
 }
+
+pub trait NotFoundMapping<T> {
+    fn map_not_found_to_option(self) -> Result<Option<T>>;
+}
+
+impl<T> NotFoundMapping<T> for Result<T> {
+    fn map_not_found_to_option(self) -> Result<Option<T>> {
+        self.map(Some).or_else(|e| match e {
+            Error::NotFound => Ok(None),
+            _ => Err(e),
+        })
+    }
+}
