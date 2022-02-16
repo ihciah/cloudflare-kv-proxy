@@ -1,7 +1,7 @@
 use std::{ops::Add, sync::Arc};
 
 use coarsetime::{Duration, Instant};
-use lru::LruCache;
+use hashlink::LruCache;
 use parking_lot::Mutex;
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -51,7 +51,7 @@ impl Client {
 
     /// Delete a single key value from cache only.
     pub fn prune_cached(&self, key: &str) {
-        self.cache.inner.lock().pop(key);
+        self.cache.inner.lock().remove(key);
     }
 
     pub(crate) fn get_cache(&self, key: &str) -> Option<Arc<CacheValue>> {
@@ -71,7 +71,7 @@ impl Client {
                 expire: Instant::now().add(self.cache.expire_ttl),
                 value: j,
             };
-            self.cache.inner.lock().put(key.to_owned(), Arc::new(cv));
+            self.cache.inner.lock().insert(key.to_owned(), Arc::new(cv));
         }
     }
 }
